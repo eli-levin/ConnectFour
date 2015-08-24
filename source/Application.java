@@ -1,0 +1,109 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+//package connectfour;
+
+import java.util.Scanner;
+
+/**
+ *
+ * @author Eli
+ */
+public class Application {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("        *--------------------------------*");
+        System.out.println("        *            welcome to          *");
+        System.out.println("        *           CONNECT FOUR         *");
+        System.out.println("        *   Copyright (c) Eli Wasserman  *");
+        System.out.println("        *--------------------------------*");
+//        System.out.print("Enter in number of players (1 or 2): ");
+//        String inString = input.nextLine();
+//        while(!inString.equals("1") && !inString.equals("2")){
+//            System.out.print("Enter a 1 for single-player, or 2 for two-player: ");
+//            inString = input.nextLine();
+//        }
+//        int numberOfPlayers = Integer.parseInt(inString);
+//        if (numberOfPlayers == 2) {
+//            System.out.print("Player 1 pick your character: @, #, o, x, O, X");
+//        }
+        
+        System.out.print("Enter in the name for player 1: ");
+        String playerName = input.nextLine();
+        Player p1 = new Player(playerName, 'X');
+        System.out.print("Enter in the name for player 2: ");
+        playerName = input.nextLine();
+        Player p2 = new Player(playerName, 'O');
+        
+        Game game = new Game(p1, p2);
+                
+        game.clearBoard();
+        boolean isOver = false;
+        
+        while(!isOver){
+            game.printBoard();
+            System.out.print(game.currentPlayer.name+"'s turn! Type a column number to make your move: ");
+            String columnInput = input.nextLine();
+            while(!goodInput(columnInput)){
+                System.out.print("Please enter in a valid column: ");
+                columnInput = input.nextLine();
+            }
+            int column = Integer.parseInt(columnInput.substring(0,1));
+            while(game.board[0][column-1] != 'x'){
+                System.out.print("That column is full. Try another: ");
+                columnInput = input.nextLine();
+                column = Integer.parseInt(columnInput.substring(0,1));
+            }
+            game.move(column-1);
+            game.switchPlayers();
+            if(game.checkWinner()){
+                isOver = true;
+                game.switchPlayers();
+            }
+        }
+        game.printBoard();
+        runWinScreen(game.currentPlayer);
+    }
+
+    private static boolean goodInput(String column) {
+        boolean isGood = false;
+        if (column.length() == 0) {
+            return false;
+        }
+        else if(Character.isDigit(column.charAt(0))){
+            isGood = (Integer.parseInt(column.substring(0,1)) < 8) &&
+                     (Integer.parseInt(column.substring(0,1)) > 0);
+        }
+        return isGood;
+    }
+
+    private static void runWinScreen(Player currentPlayer){
+        final int LINE_LEN = 32;
+        String startLine = "        *";
+        String winnerString;
+        System.out.println("        *--------------------------------*");
+        System.out.println("        *        Congratulations,        *");
+        winnerString = startLine;
+        int numStartSpaces = (LINE_LEN - currentPlayer.name.length())/2;
+        int numEndSpaces = LINE_LEN - numStartSpaces - currentPlayer.name.length();
+        for (int i = 0; i < numStartSpaces; i++) {
+            winnerString += " ";
+        }
+        winnerString += currentPlayer.name.toUpperCase();
+        for (int i = 0; i < numEndSpaces; i++) {
+            winnerString += " ";
+        }
+        winnerString += ("*" + System.lineSeparator());
+        System.out.print(winnerString);
+        System.out.println("        *           YOU WIN!!!           *");
+        System.out.println("        *--------------------------------*");
+    }
+    
+}
